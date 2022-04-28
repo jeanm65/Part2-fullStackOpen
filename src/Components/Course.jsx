@@ -2,11 +2,11 @@ import React from 'react';
 import Content from './Content';
 import Header from './Header';
 
-const Course = ({course}) => {
+const Course = ({courses}) => {
   return (
     <div>
-      <Header name={course.name} />
-      <Content parts={course.parts} />
+      <Header name={courses.name} />
+      <Content parts={courses.parts} />
     </div>
   );
 };
