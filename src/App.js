@@ -1,5 +1,5 @@
 import Course from "./Components/Course"
-import TItle from "./Components/TItle";
+import Title from "./Components/Title";
 
 const App = () => {
   const courses = [
@@ -48,7 +48,7 @@ const App = () => {
   ]
     return (
       <div>
-        <TItle />
+        <Title />
         <Course courses={courses[0]} />
         <Course courses={courses[1]} />
       </div>
