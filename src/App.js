@@ -11,6 +11,11 @@ const App = () => {
   }
   const addName = (e) => {
       e.preventDefault();
+      if(persons.map(p=>p.name === newName)){
+        alert(`${newName} is already added to phonebook`);
+        setNewName('');
+        return false
+      };
       const nameObject = {
         name: newName,
         id: persons.length + 1
