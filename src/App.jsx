@@ -6,14 +6,17 @@ import Persons from "./components/Persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
+  const [name, setName] = useState('')
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
+  
   useEffect(() => {
     axios.get('http://localhost:3001/persons').then((response) => {
       const data = response.data;
-      setPersons(data)
+      setPersons(data);
     })
-  }, [])
+  }, []);
+ 
   const handleNameChange = (e) => {
     setNewName(e.target.value);
   };
@@ -48,14 +51,14 @@ const App = () => {
       setFoundPerson(persons);
       // If the text field is empty, show all users
     }
-    setNewName(e.target.value);
+    setName(e.target.value);
   };
  
   return (
     <div>
       <h2>Phonebook</h2>
       <div>
-        <Filter filter={filter} newName={newName} />
+        <Filter filter={filter} name={name} />
       </div>
       <h2>Add a new</h2>
       <PersonForm
