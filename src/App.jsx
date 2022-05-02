@@ -1,22 +1,17 @@
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./components/PersonForm";
-import Persons from "./components/Persons";
 
 const App = () => {
-  const [persons, setPersons] = useState([]);
-  const [name, setName] = useState('')
+  const [persons, setPersons] = useState([
+    { name: "Arto Hellas", number: "040-123456", id: 1 },
+    { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
+    { name: "Dan Abramov", number: "12-43-234345", id: 3 },
+    { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
+  ]);
+  const [search, setSearch] = useState("");
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
-  
-  useEffect(() => {
-    axios.get('http://localhost:3001/persons').then((response) => {
-      const data = response.data;
-      setPersons(data);
-    })
-  }, []);
- 
   const handleNameChange = (e) => {
     setNewName(e.target.value);
   };
@@ -38,27 +33,27 @@ const App = () => {
     setPersons(persons.concat(nameObject));
     setNewName("");
   };
-  const [foundPerson, setFoundPerson] = useState(persons);
-  
-  const filter = (e) => {
-    if (e.target.value !== '') {
-      const results = persons.filter((user) => {
-        return user.name.toLowerCase().startsWith(e.target.value.toLowerCase());
-        // Use the toLowerCase() method to make it case-insensitive
-      });
-      setFoundPerson(results);
-    } else {
-      setFoundPerson(persons);
-      // If the text field is empty, show all users
-    }
-    setName(e.target.value);
+
+  //Search and filter
+
+  const handleNewSearch = (e) => {
+    setSearch(e.target.value);
   };
- 
+  const filtered = !search ? (
+    persons
+  ) : search ? (
+    persons.filter((person) =>
+      person.name.toLowerCase().includes(search.toLowerCase())
+    )
+  ) : (
+    <h2>No results found!</h2>
+  );
+
   return (
     <div>
       <h2>Phonebook</h2>
       <div>
-        <Filter filter={filter} name={name} />
+        <Filter onChange={handleNewSearch} value={search} />
       </div>
       <h2>Add a new</h2>
       <PersonForm
@@ -69,11 +64,13 @@ const App = () => {
         handleNumberChange={handleNumberChange}
       />
       <h2>Numbers</h2>
-      {foundPerson && foundPerson.length > 0 ? (
-        persons.map((person) => (
-          <Persons key={person.name} persons={person} />
-        ))
-      ):(<h2>No results found!</h2>)}
+      {filtered.map((person) => {
+        return (
+          <p key={person.id}>
+            {person.name} - {person.number}
+          </p>
+        );
+      })}
     </div>
   );
 };
