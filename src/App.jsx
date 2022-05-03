@@ -1,76 +1,59 @@
-import { useState } from "react";
+import axios from "axios";
+import { useEffect, useState } from "react";
 import Filter from "./components/Filter";
-import PersonForm from "./components/PersonForm";
 
 const App = () => {
-  const [persons, setPersons] = useState([
-    { name: "Arto Hellas", number: "040-123456", id: 1 },
-    { name: "Ada Lovelace", number: "39-44-5323523", id: 2 },
-    { name: "Dan Abramov", number: "12-43-234345", id: 3 },
-    { name: "Mary Poppendieck", number: "39-23-6423122", id: 4 },
-  ]);
+  const [countries, setCountries] = useState([]);
   const [search, setSearch] = useState("");
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
-  const handleNameChange = (e) => {
-    setNewName(e.target.value);
-  };
-  const handleNumberChange = (e) => {
-    setNewNumber(e.target.value);
-  };
-  const addName = (e) => {
-    e.preventDefault();
-    if (persons.find((p) => p.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
-      setNewName("");
-      return false;
-    }
-    const nameObject = {
-      name: newName,
-      id: persons.length + 1,
-      number: newNumber,
-    };
-    setPersons(persons.concat(nameObject));
-    setNewName("");
-  };
+
+  useEffect(() => {
+    axios.get("https://restcountries.com/v3.1/all").then((res) => {
+      const data = res.data;
+      console.log(data);
+      setCountries(data);
+    });
+  }, []);
 
   //Search and filter
 
   const handleNewSearch = (e) => {
     setSearch(e.target.value);
   };
-  const filtered = !search ? (
-    persons
-  ) : search ? (
-    persons.filter((person) =>
-      person.name.toLowerCase().includes(search.toLowerCase())
-    )
-  ) : (
-    <h2>No results found!</h2>
-  );
 
+  const filteredResult = countries.filter((country) =>
+    country.name.common.toLowerCase().includes(search.toLowerCase())
+  );
+  const filtered = !search ? countries.length === 0 : filteredResult;
   return (
     <div>
-      <h2>Phonebook</h2>
+      <h2>Countries API</h2>
       <div>
         <Filter onChange={handleNewSearch} value={search} />
       </div>
-      <h2>Add a new</h2>
-      <PersonForm
-        addName={addName}
-        newName={newName}
-        newNumber={newNumber}
-        handleNameChange={handleNameChange}
-        handleNumberChange={handleNumberChange}
-      />
-      <h2>Numbers</h2>
-      {filtered.map((person) => {
-        return (
-          <p key={person.id}>
-            {person.name} - {person.number}
-          </p>
-        );
-      })}
+      {search &&
+        filtered.length === 1 &&
+        filtered.map((country) => (
+          <div key={country.name.common}>
+            <p>{country.name.common}</p>
+            <p>capital : {country.capital[0]}</p>
+            <p>area : {country.area}</p>
+            <h3> languages :  </h3>
+             {Object.values(country.languages).map((value) => (
+               <ul key={value}>
+                 <li>{value}</li>
+               </ul>
+             ))}
+            flag : <img src={country.flags.svg} alt="" />
+          </div>
+        ))}
+      {search && filtered.length > 10 && (
+        <p>Too many matches, specify another filter</p>
+      )}
+      {search &&
+        filtered.length < 10 &&
+        filtered.map((country) => (
+          <p key={country.name.common}>{country.name.common}</p>
+        ))}
     </div>
   );
 };
