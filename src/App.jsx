@@ -1,59 +1,76 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import Filter from "./components/Filter";
+
+import axios from "axios";
+
+import FilterInput from "./filteredCountryComponent/FilterInput";
+import Result from "./filteredCountryComponent/result/Result";
 
 const App = () => {
   const [countries, setCountries] = useState([]);
+  const [filteredCountries, setFilteredCountries] = useState([]);
   const [search, setSearch] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
   useEffect(() => {
-    axios.get("https://restcountries.com/v3.1/all").then((res) => {
-      const data = res.data;
-      console.log(data);
-      setCountries(data);
-    });
+    const fn = async () => {
+      try {
+        setLoading(true);
+
+        // load all countries
+        const res = await axios.get("https://restcountries.com/v3.1/all");
+        const data = res.data;
+
+        setCountries(data);
+        setLoading(false);
+      } catch (e) {
+        setError(e.message);
+      }
+    };
+    fn();
   }, []);
 
-  //Search and filter
+  // Search and filter
+  const handleSearch = (e) => {
+    const { value } = e.target;
+    setSearch(value);
 
-  const handleNewSearch = (e) => {
-    setSearch(e.target.value);
+    if (!value) {
+      setFilteredCountries([]);
+      return;
+    }
+
+    const filteredResult = countries.filter((country) => {
+      return country.name.common.toLowerCase().includes(value.toLowerCase());
+    });
+
+    setFilteredCountries(filteredResult);
   };
 
-  const filteredResult = countries.filter((country) =>
-    country.name.common.toLowerCase().includes(search.toLowerCase())
-  );
-  const filtered = !search ? countries.length === 0 : filteredResult;
+  if (loading) {
+    return <div>...Loading</div>;
+  }
+
+  const renderResult = (filteredCountries) => {
+    if (filteredCountries.length > 10) {
+      return <p>Too many matches result. Specify another filter</p>;
+    }
+
+    return <Result countries={filteredCountries} />;
+  };
+
   return (
     <div>
       <h2>Countries API</h2>
       <div>
-        <Filter onChange={handleNewSearch} value={search} />
+        <FilterInput onChange={handleSearch} value={search} />
       </div>
-      {search &&
-        filtered.length === 1 &&
-        filtered.map((country) => (
-          <div key={country.name.common}>
-            <p>{country.name.common}</p>
-            <p>capital : {country.capital[0]}</p>
-            <p>area : {country.area}</p>
-            <h3> languages :  </h3>
-             {Object.values(country.languages).map((value) => (
-               <ul key={value}>
-                 <li>{value}</li>
-               </ul>
-             ))}
-            flag : <img src={country.flags.svg} alt="" />
-          </div>
-        ))}
-      {search && filtered.length > 10 && (
-        <p>Too many matches, specify another filter</p>
+      {!error && filteredCountries.length > 0 ? (
+        renderResult(filteredCountries)
+      ) : (
+        <div>No result</div>
       )}
-      {search &&
-        filtered.length < 10 &&
-        filtered.map((country) => (
-          <p key={country.name.common}>{country.name.common}</p>
-        ))}
+      {error && <span>{error}</span>}
     </div>
   );
 };
