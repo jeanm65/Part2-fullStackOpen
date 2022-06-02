@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import Weather from "./Weather";
 
 const LessResult = ({ country, showDetailByDefault = false }) => {
   const [showDetails, setShowDetails] = useState(false);
@@ -32,7 +33,8 @@ const LessResult = ({ country, showDetailByDefault = false }) => {
                 <li>{value}</li>
               </ul>
             ))}
-          flag : <img src={country.flags.svg} alt="" />
+          flag : <img src={country.flags.svg} alt="" className="flag" />
+          <Weather country={country} />
         </div>
       )}
     </div>

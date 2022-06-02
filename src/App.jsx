@@ -20,7 +20,8 @@ const App = () => {
         // load all countries
         const res = await axios.get("https://restcountries.com/v3.1/all");
         const data = res.data;
-
+        console.log(data);
+        
         setCountries(data);
         setLoading(false);
       } catch (e) {
