@@ -10,8 +10,7 @@ const App = () => {
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
   useEffect(() => {
-    personServices.getAll()
-    .then((response) => {
+    personServices.getAll().then((response) => {
       const data = response.data;
       setPersons(data);
     });
@@ -56,6 +55,12 @@ const App = () => {
     <h2>No results found!</h2>
   );
 
+  const removeUser = (id) => {
+    axios.delete(`http://localhost:3001/persons/${id}`);
+    console.log('delete this person?');
+    setPersons(persons.filter((person) => person.id !== id));
+  };
+
   return (
     <div>
       <h2>Phonebook</h2>
@@ -75,6 +80,7 @@ const App = () => {
         return (
           <p key={person.id}>
             {person.name} - {person.number}
+            <button onClick={() => removeUser(person.id)}>delete</button>
           </p>
         );
       })}

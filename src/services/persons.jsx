@@ -2,16 +2,21 @@ import axios from "axios";
 const baseUrl = "http://localhost:3001/persons";
 
 const getAll = () => {
-  return axios.get(baseUrl)
+  return axios.get(baseUrl);
+};
+
+const create = (nameObject) => {
+  return axios.post(baseUrl, nameObject);
+};
+
+const handleDelete = (id) => {
+  axios.delete(baseUrl/id)
 }
 
-const create = nameObject => {
-  return axios.post(baseUrl, nameObject)
-}
-
-const personServices =  {
+const personServices = {
   getAll,
-  create
-}
+  create,
+  handleDelete
+};
 
 export default personServices;
