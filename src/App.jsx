@@ -29,11 +29,14 @@ const App = () => {
     }
     const nameObject = {
       name: newName,
-      id: persons.length + 1,
       number: newNumber,
+      id: persons.length + 1,
     };
     setPersons(persons.concat(nameObject));
     setNewName("");
+    axios.post("http://localhost:3001/persons", nameObject).then((res) => {
+      console.log(res);
+    });
   };
 
   //Search and filter
@@ -47,7 +50,8 @@ const App = () => {
     persons.filter((person) =>
       person.name.toLowerCase().includes(search.toLowerCase())
     )
-  ) : (<h2>No results found!</h2>
+  ) : (
+    <h2>No results found!</h2>
   );
 
   return (
