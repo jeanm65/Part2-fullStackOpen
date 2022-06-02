@@ -57,7 +57,6 @@ const App = () => {
 
   const removeUser = (id) => {
     axios.delete(`http://localhost:3001/persons/${id}`);
-    console.log('delete this person?');
     setPersons(persons.filter((person) => person.id !== id));
   };
 
@@ -80,7 +79,14 @@ const App = () => {
         return (
           <p key={person.id}>
             {person.name} - {person.number}
-            <button onClick={() => removeUser(person.id)}>delete</button>
+            <button
+              onClick={() => {
+                removeUser(person.id);
+                window.confirm(`delete ${person.name} ?`);
+              }}
+            >
+              delete
+            </button>
           </p>
         );
       })}
