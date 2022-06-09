@@ -1,63 +1,67 @@
 import axios from "axios";
 import { useEffect, useState } from "react";
 import Filter from "./components/Filter";
-import PersonForm from "./components/PersonForm";
-import personServices from "./services/persons";
+import PersonForm from "./containers/persons/PersonForm";
+import Persons from "./containers/persons/Persons";
+import { createPerson } from "./services/persons";
+import { editPerson } from "./services/persons";
+import { removePerson } from "./services/persons";
+import { getPersons } from "./services/persons";
+import { BASE_URL } from "./utils/constants";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [search, setSearch] = useState("");
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
+
   useEffect(() => {
-    personServices.getAll().then((response) => {
-      const data = response.data;
-      setPersons(data);
-    });
-  }, []);
-  const handleNameChange = (e) => {
-    setNewName(e.target.value);
-  };
-  const handleNumberChange = (e) => {
-    setNewNumber(e.target.value);
-  };
-  const addName = (e) => {
-    e.preventDefault();
-    if (persons.find((p) => p.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
-      setNewName("");
-      return false;
-    }
-    const nameObject = {
-      name: newName,
-      number: newNumber,
-      id: persons.length + 1,
+    const init = async () => {
+      const result = await getPersons();
+      setPersons(result);
     };
-    setPersons(persons.concat(nameObject));
-    setNewName("");
-    personServices.create.then((res) => {
-      console.log(res);
-    });
-  };
+    init();
+  }, []);
+
+  const updateNumber = async (id) => {};
 
   //Search and filter
 
-  const handleNewSearch = (e) => {
-    setSearch(e.target.value);
+  // creation
+  const handleCreatePerson = async (values) => {
+    const person = await createPerson(values);
+    setPersons((prev) => {
+      return [
+        ...prev,
+        {
+          id: persons[persons.length - 1].id++,
+          ...person
+        }
+      ];
+    });
   };
-  const filtered = !search ? (
-    persons
-  ) : search ? (
-    persons.filter((person) =>
-      person.name.toLowerCase().includes(search.toLowerCase())
-    )
-  ) : (
-    <h2>No results found!</h2>
-  );
 
-  const removeUser = (id) => {
-    axios.delete(`http://localhost:3001/persons/${id}`);
-    setPersons(persons.filter((person) => person.id !== id));
+  // deletion
+  const handleDeletePerson = async (id) => {
+    const person = await removePerson(id);
+    const newPersons = persons.filter((p) => p.id !== person.id);
+    setPersons(newPersons);
+  };
+
+  // deletion
+  const handleUpdatePerson = async (id, values) => {
+    const updatedPerson = await editPerson(id, values);
+    // const newPersons = persons.filter((p) => p.id !== person.id)
+    const newPersons = [...persons];
+    newPersons.map((person) => {
+      if (person.id === id) {
+        return {
+          ...person,
+          ...updatedPerson
+        };
+      }
+
+      return person;
+    });
+    setPersons(newPersons);
   };
 
   return (
@@ -66,30 +70,13 @@ const App = () => {
       <div>
         <Filter onChange={handleNewSearch} value={search} />
       </div>
-      <h2>Add a new</h2>
-      <PersonForm
-        addName={addName}
-        newName={newName}
-        newNumber={newNumber}
-        handleNameChange={handleNameChange}
-        handleNumberChange={handleNumberChange}
+      <h2>Add a new person</h2>
+      <PersonForm onSave={handleCreatePerson} />
+      <Persons
+        persons={persons}
+        onDelete={handleDeletePerson}
+        onUpdate={handleUpdatePerson}
       />
-      <h2>Numbers</h2>
-      {filtered.map((person) => {
-        return (
-          <p key={person.id}>
-            {person.name} - {person.number}
-            <button
-              onClick={() => {
-                removeUser(person.id);
-                window.confirm(`delete ${person.name} ?`);
-              }}
-            >
-              delete
-            </button>
-          </p>
-        );
-      })}
     </div>
   );
 };
