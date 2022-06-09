@@ -1,16 +1,16 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
 import Filter from "./components/Filter";
 import PersonForm from "./containers/persons/PersonForm";
 import Persons from "./containers/persons/Persons";
-import { createPerson } from "./services/persons";
-import { editPerson } from "./services/persons";
-import { removePerson } from "./services/persons";
-import { getPersons } from "./services/persons";
-import { BASE_URL } from "./utils/constants";
+import { createPerson } from "./services/Persons";
+import { editPerson } from "./services/Persons";
+import { removePerson } from "./services/Persons";
+import { getPersons } from "./services/Persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
+  const [newName, setNewName] = useState('');
+  const [newNumber, setNewNumber] = useState('');
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -32,9 +32,11 @@ const App = () => {
       return [
         ...prev,
         {
+          newName,
+          newNumber,
           id: persons[persons.length - 1].id++,
-          ...person
-        }
+          ...person,
+        },
       ];
     });
   };
@@ -46,7 +48,7 @@ const App = () => {
     setPersons(newPersons);
   };
 
-  // deletion
+  // update
   const handleUpdatePerson = async (id, values) => {
     const updatedPerson = await editPerson(id, values);
     // const newPersons = persons.filter((p) => p.id !== person.id)
@@ -55,7 +57,7 @@ const App = () => {
       if (person.id === id) {
         return {
           ...person,
-          ...updatedPerson
+          ...updatedPerson,
         };
       }
 
@@ -63,15 +65,32 @@ const App = () => {
     });
     setPersons(newPersons);
   };
+  const handleNewSearch = (e) => {
+    setSearch(e.target.value);
+  };
+  const filtered = !search ? (
+    persons
+  ) : search ? (
+    persons.filter((person) =>
+      person.name.toLowerCase().includes(search.toLowerCase())
+    )
+  ) : (
+    <h2>No results found!</h2>
+  );
 
   return (
     <div>
       <h2>Phonebook</h2>
       <div>
-        <Filter onChange={handleNewSearch} value={search} />
+        <Filter
+          onChange={handleNewSearch}
+          value={search}
+          filteredPersons={filtered}
+          onDelete={handleDeletePerson}
+        />
       </div>
       <h2>Add a new person</h2>
-      <PersonForm onSave={handleCreatePerson} />
+      <PersonForm onSave={handleCreatePerson} newName={newName} newNumber={newNumber} />
       <Persons
         persons={persons}
         onDelete={handleDeletePerson}
