@@ -10,7 +10,6 @@ const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const [search, setSearch] = useState("");
 
@@ -27,11 +26,9 @@ const App = () => {
   // deletion
   const handleDeletePerson = async (id) => {
     try {
-      setLoading(true);
       await removePerson(id);
       const newPersons = persons.filter((p) => p.id !== id);
       setPersons(newPersons);
-      setLoading(false);
     } catch (error) {
       console.log("errorMessage:", error.message);
     }
@@ -53,6 +50,8 @@ const App = () => {
         },
       ];
     });
+    setNewName(newName);
+    setNewNumber(newNumber);
   };
 
   const handleNewSearch = (e) => {
@@ -85,7 +84,6 @@ const App = () => {
         persons={persons}
         person={persons.map((p) => p)}
         setPersons={setPersons}
-        setLoading={setLoading}
       />
       <FilteredResuls
         filteredPersons={filtered}

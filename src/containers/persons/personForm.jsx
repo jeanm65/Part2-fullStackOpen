@@ -7,7 +7,6 @@ const PersonForm = ({
   persons,
   person,
   setPersons,
-  setLoading,
 }) => {
   const [values, setValues] = useState({
     name: "",
@@ -32,27 +31,20 @@ const PersonForm = ({
 
   // update number
   const onUpdatePerson = async () => {
-    setLoading(true);
     const id = await persons.find(p => p.name === values.name && p.id);
-    console.log('id:', id);
     
-    // const name = await person.find(p => p.name === values.name && p.name);
     const newValues = {name: values.name, id: id.id, number: values.number };
-    // console.log("newValues", newValues);
 
     const updatedPerson = await editPerson(id.id, newValues);
-    // console.log('updatePerson', updatedPerson);
     
     setPersons(
       persons.map((person) =>
         person.id === id.id ? { ...updatedPerson } : person
       )
     );
-    setLoading(false);
   };
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async () => {
     // if person exist
     const samePersonName = persons.find((person) => person.name === values.name);
     if (samePersonName) {
@@ -67,12 +59,12 @@ const PersonForm = ({
       return;
     }
     onSave(values);
-    setValues('');
+    setValues('')
   };
 
   return (
     <div>
-      <form onSubmit={onSubmit}>
+      <form>
         <div>
           name:
           <input name="name" value={values.name} onChange={handleChange} />{" "}
