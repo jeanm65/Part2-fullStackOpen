@@ -7,20 +7,26 @@ const instance = axios.create({
 
 export const find = async (url) => {
   const result = await instance.get(url);
+  if (result.status !== 200) return;
   return result.data;
 };
 
 export const create = async (url, values) => {
   const result = await instance.post(url, values);
+  if (result.status !== 200) return;
   return result.data;
 };
 
 export const remove = async (url, id) => {
   const result = await instance.delete(url + "/" + id);
+  if (result.status !== 200) return;
   return result.data;
 };
 
 export const edit = async (url, id, values) => {
   const result = instance.put(`${url}/${id}`, values);
+  console.log('result-data:', result.data);
+  
+  if (result.status !== 200) return;
   return result.data;
 };

@@ -1,13 +1,12 @@
 import React from 'react';
 
-const Filter = ({onChange, value, filtered, onDelete}) => {
+const FilteredResuls = ({filteredPersons, onDelete}) => {
   return (
     <div>
-      filter shown <input type='search' onChange={onChange} value={value} />
-      {filtered.map((person) => {
+      {filteredPersons.map((person) => {
         return (
-          <p key={person.id}>
-            {person.name} - {person.number}
+          <div key={person.id}>
+            <span>{JSON.stringify(person.name)} - {JSON.stringify(person.number)}</span>
             <button
               onClick={() => {
                 onDelete(person.id);
@@ -16,11 +15,11 @@ const Filter = ({onChange, value, filtered, onDelete}) => {
             >
               delete
             </button>
-          </p>
+          </div>
         );
       })}
     </div>
   );
 };
 
-export default Filter;
+export default FilteredResuls;

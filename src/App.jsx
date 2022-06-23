@@ -1,16 +1,17 @@
 import { useEffect, useState } from "react";
-import Filter from "./components/Filter";
+import FilteredResuls from "./components/FilteredResuls";
+import Filter from "./components/FilterForm";
 import PersonForm from "./containers/persons/PersonForm";
-import Persons from "./containers/persons/Persons";
 import { createPerson } from "./services/Persons";
-import { editPerson } from "./services/Persons";
 import { removePerson } from "./services/Persons";
 import { getPersons } from "./services/Persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
-  const [newName, setNewName] = useState('');
-  const [newNumber, setNewNumber] = useState('');
+  const [newName, setNewName] = useState("");
+  const [newNumber, setNewNumber] = useState("");
+  const [loading, setLoading] = useState(false);
+
   const [search, setSearch] = useState("");
 
   useEffect(() => {
@@ -21,9 +22,22 @@ const App = () => {
     init();
   }, []);
 
-  const updateNumber = async (id) => {};
-
   //Search and filter
+
+  // deletion
+  const handleDeletePerson = async (id) => {
+    try {
+      setLoading(true);
+      await removePerson(id);
+      const newPersons = persons.filter((p) => p.id !== id);
+      setPersons(newPersons);
+      setLoading(false);
+    } catch (error) {
+      console.log("errorMessage:", error.message);
+    }
+  };
+
+  // the number update is managed by the PersonForm component
 
   // creation
   const handleCreatePerson = async (values) => {
@@ -41,30 +55,6 @@ const App = () => {
     });
   };
 
-  // deletion
-  const handleDeletePerson = async (id) => {
-    const person = await removePerson(id);
-    const newPersons = persons.filter((p) => p.id !== person.id);
-    setPersons(newPersons);
-  };
-
-  // update
-  const handleUpdatePerson = async (id, values) => {
-    const updatedPerson = await editPerson(id, values);
-    // const newPersons = persons.filter((p) => p.id !== person.id)
-    const newPersons = [...persons];
-    newPersons.map((person) => {
-      if (person.id === id) {
-        return {
-          ...person,
-          ...updatedPerson,
-        };
-      }
-
-      return person;
-    });
-    setPersons(newPersons);
-  };
   const handleNewSearch = (e) => {
     setSearch(e.target.value);
   };
@@ -90,11 +80,16 @@ const App = () => {
         />
       </div>
       <h2>Add a new person</h2>
-      <PersonForm onSave={handleCreatePerson} newName={newName} newNumber={newNumber} />
-      <Persons
+      <PersonForm
+        onSave={handleCreatePerson}
         persons={persons}
+        person={persons.map((p) => p)}
+        setPersons={setPersons}
+        setLoading={setLoading}
+      />
+      <FilteredResuls
+        filteredPersons={filtered}
         onDelete={handleDeletePerson}
-        onUpdate={handleUpdatePerson}
       />
     </div>
   );

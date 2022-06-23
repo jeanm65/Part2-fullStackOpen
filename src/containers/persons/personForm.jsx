@@ -1,16 +1,24 @@
 import React, { useEffect, useState } from "react";
+import { editPerson } from "../../services/Persons";
 
-const PersonForm = ({ onSave, defaultValues }) => {
+const PersonForm = ({
+  onSave,
+  defaultValues,
+  persons,
+  person,
+  setPersons,
+  setLoading,
+}) => {
   const [values, setValues] = useState({
     name: "",
-    number: 0
+    number: 0,
   });
 
   useEffect(() => {
     if (defaultValues) {
       setValues((prev) => ({
         ...prev,
-        ...defaultValues
+        ...defaultValues,
       }));
     }
   }, [defaultValues]);
@@ -18,12 +26,48 @@ const PersonForm = ({ onSave, defaultValues }) => {
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
-  const onSubmit = () => {
+  // update number
+  const onUpdatePerson = async () => {
+    setLoading(true);
+    const id = await persons.find(p => p.name === values.name && p.id);
+    console.log('id:', id);
+    
+    // const name = await person.find(p => p.name === values.name && p.name);
+    const newValues = {name: values.name, id: id.id, number: values.number };
+    // console.log("newValues", newValues);
+
+    const updatedPerson = await editPerson(id.id, newValues);
+    // console.log('updatePerson', updatedPerson);
+    
+    setPersons(
+      persons.map((person) =>
+        person.id === id.id ? { ...updatedPerson } : person
+      )
+    );
+    setLoading(false);
+  };
+
+  const onSubmit = async (e) => {
+    e.preventDefault();
+    // if person exist
+    const samePersonName = persons.find((person) => person.name === values.name);
+    if (samePersonName) {
+      // popup
+      const isOk = window.confirm(
+        `${values.name} is already added to phonebook, replace the old number with a new one?`
+      );
+      if (isOk) {
+        // update that person with the new values
+        onUpdatePerson(person.id);
+      }
+      return;
+    }
     onSave(values);
+    setValues('');
   };
 
   return (
@@ -39,7 +83,7 @@ const PersonForm = ({ onSave, defaultValues }) => {
           <input name="number" value={values.number} onChange={handleChange} />
         </div>
         <div>
-          <button type="submit">Add</button>
+          <button type="submit" onClick={() => onSubmit()}>Add</button>
         </div>
       </form>
     </div>
