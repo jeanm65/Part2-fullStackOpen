@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
-import FilteredResuls from "./components/FilteredResuls";
+import FilteredResults from "./components/FilteredResults";
 import Filter from "./components/FilterForm";
 import PersonForm from "./containers/persons/PersonForm";
 import { createPerson } from "./services/Persons";
 import { removePerson } from "./services/Persons";
 import { getPersons } from "./services/Persons";
+import Notifications from "./components/Notifications";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [newName, setNewName] = useState("");
   const [newNumber, setNewNumber] = useState("");
-  const [loading, setLoading] = useState(false);
 
   const [search, setSearch] = useState("");
 
@@ -27,11 +27,9 @@ const App = () => {
   // deletion
   const handleDeletePerson = async (id) => {
     try {
-      setLoading(true);
       await removePerson(id);
       const newPersons = persons.filter((p) => p.id !== id);
       setPersons(newPersons);
-      setLoading(false);
     } catch (error) {
       console.log("errorMessage:", error.message);
     }
@@ -41,18 +39,24 @@ const App = () => {
 
   // creation
   const handleCreatePerson = async (values) => {
-    const person = await createPerson(values);
-    setPersons((prev) => {
-      return [
-        ...prev,
-        {
-          newName,
-          newNumber,
-          id: persons[persons.length - 1].id++,
-          ...person,
-        },
-      ];
-    });
+    try {
+      const person = await createPerson(values);
+      setPersons((prev) => {
+        return [
+          ...prev,
+          {
+            newName,
+            newNumber,
+            id: persons[persons.length - 1].id++,
+            ...person,
+          },
+        ];
+      });
+      setNewName(newName);
+      setNewNumber(newNumber);
+    } catch (error) {
+      console.log(error.message);
+    }
   };
 
   const handleNewSearch = (e) => {
@@ -71,6 +75,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <div></div>
       <div>
         <Filter
           onChange={handleNewSearch}
@@ -85,9 +90,8 @@ const App = () => {
         persons={persons}
         person={persons.map((p) => p)}
         setPersons={setPersons}
-        setLoading={setLoading}
       />
-      <FilteredResuls
+      <FilteredResults
         filteredPersons={filtered}
         onDelete={handleDeletePerson}
       />

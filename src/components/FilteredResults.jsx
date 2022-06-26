@@ -1,12 +1,14 @@
-import React from 'react';
+import React from "react";
 
-const FilteredResuls = ({filteredPersons, onDelete}) => {
+const FilteredResults = ({ filteredPersons, onDelete }) => {
   return (
     <div>
       {filteredPersons.map((person) => {
         return (
           <div key={person.id}>
-            <span>{JSON.stringify(person.name)} - {JSON.stringify(person.number)}</span>
+            <span key={person.id}>
+              {JSON.stringify(person.name)} - {JSON.stringify(person.number)}{" "}
+            </span>
             <button
               onClick={() => {
                 onDelete(person.id);
@@ -22,4 +24,4 @@ const FilteredResuls = ({filteredPersons, onDelete}) => {
   );
 };
 
-export default FilteredResuls;
+export default FilteredResults;

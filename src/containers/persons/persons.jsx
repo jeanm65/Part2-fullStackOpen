@@ -1,10 +1,6 @@
-import PersonForm from "./PersonForm";
 
-const Persons = ({ persons, onDelete, onUpdate }) => {
-  const handleSubmit = (id) => (values) => {
-    onUpdate(id, values);
-  };
 
+const Persons = ({ persons, onDelete }) => {
   return (
     <div>
       <h4>List of persons</h4>

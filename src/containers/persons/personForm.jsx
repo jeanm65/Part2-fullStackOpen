@@ -1,18 +1,14 @@
 import React, { useEffect, useState } from "react";
+import Notifications from "../../components/Notifications";
 import { editPerson } from "../../services/Persons";
 
-const PersonForm = ({
-  onSave,
-  defaultValues,
-  persons,
-  person,
-  setPersons,
-  setLoading,
-}) => {
+const PersonForm = ({ onSave, defaultValues, persons, person, setPersons }) => {
   const [values, setValues] = useState({
-    name: "",
-    number: 0,
+    name: '',
+    number: '',
   });
+
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     if (defaultValues) {
@@ -32,29 +28,27 @@ const PersonForm = ({
 
   // update number
   const onUpdatePerson = async () => {
-    setLoading(true);
-    const id = await persons.find(p => p.name === values.name && p.id);
-    console.log('id:', id);
-    
-    // const name = await person.find(p => p.name === values.name && p.name);
-    const newValues = {name: values.name, id: id.id, number: values.number };
-    // console.log("newValues", newValues);
+    const id = await persons.find((p) => p.name === values.name && p.id);
+
+    const newValues = { name: values.name, id: id.id, number: values.number };
 
     const updatedPerson = await editPerson(id.id, newValues);
-    // console.log('updatePerson', updatedPerson);
-    
+
     setPersons(
       persons.map((person) =>
         person.id === id.id ? { ...updatedPerson } : person
       )
     );
-    setLoading(false);
   };
 
-  const onSubmit = async (e) => {
-    e.preventDefault();
+  const onSubmit = async () => {
+    const timeOut = setTimeout(() => {
+      setErrorMessage(null);
+    }, 5000);
     // if person exist
-    const samePersonName = persons.find((person) => person.name === values.name);
+    const samePersonName = persons.find(
+      (person) => person.name === values.name
+    );
     if (samePersonName) {
       // popup
       const isOk = window.confirm(
@@ -63,16 +57,24 @@ const PersonForm = ({
       if (isOk) {
         // update that person with the new values
         onUpdatePerson(person.id);
+        setErrorMessage(`${values.name}'s number modified!`);
+        setValues(null);
+        timeOut();
       }
       return;
     }
     onSave(values);
+    setErrorMessage(`added ${values.name} ! `);
     setValues('');
+    timeOut();
   };
 
   return (
     <div>
-      <form onSubmit={onSubmit}>
+      <Notifications message={errorMessage} values={values.name} />
+      <form
+        onSubmit={e => e.preventDefault()}
+      >
         <div>
           name:
           <input name="name" value={values.name} onChange={handleChange} />{" "}
@@ -83,7 +85,10 @@ const PersonForm = ({
           <input name="number" value={values.number} onChange={handleChange} />
         </div>
         <div>
-          <button type="submit" onClick={() => onSubmit()}>Add</button>
+          <button type="submit" onClick={() => {onSubmit();
+          setValues('')}}>
+            Add
+          </button>
         </div>
       </form>
     </div>
