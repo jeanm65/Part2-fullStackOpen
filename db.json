@@ -3,7 +3,7 @@
     {
       "name": "Arto Hellas",
       "id": 1,
-      "number": "063312222222222"
+      "number": "0444444-99999"
     },
     {
       "name": "Ada Lovelace",
@@ -23,7 +23,7 @@
     {
       "name": "monia",
       "id": 5,
-      "number": "04555-9999999999"
+      "number": "0444444-99999"
     },
     {
       "name": "dren",
@@ -33,7 +33,7 @@
     {
       "name": "jean marie",
       "id": 7,
-      "number": "555555-2222"
+      "number": "0789456123"
     },
     {
       "name": "alain",
@@ -51,44 +51,19 @@
       "id": 12
     },
     {
-      "name": "clark",
-      "number": "07955555",
-      "id": 13
-    },
-    {
-      "name": "chell",
-      "number": "0555522222",
-      "id": 14
-    },
-    {
-      "name": "slash",
-      "number": "063312222222222",
-      "id": 15
-    },
-    {
       "name": "SALUT",
       "number": "741741",
       "id": 17
     },
     {
-      "name": "gregoire",
-      "number": "11115555555",
-      "id": 18
-    },
-    {
-      "name": "shrek",
-      "number": "55559--555",
-      "id": 19
-    },
-    {
-      "name": "jerry",
-      "number": "777-222222",
-      "id": 20
-    },
-    {
       "name": "slamDunk",
       "number": "333333333-6666",
       "id": 21
+    },
+    {
+      "name": "silviana",
+      "undefined": "silviana",
+      "id": 22
     }
   ]
 }

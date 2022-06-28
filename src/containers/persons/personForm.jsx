@@ -1,14 +1,16 @@
 import React, { useEffect, useState } from "react";
+import Error from "../../components/Error";
 import Notifications from "../../components/Notifications";
 import { editPerson } from "../../services/Persons";
 
 const PersonForm = ({ onSave, defaultValues, persons, person, setPersons }) => {
   const [values, setValues] = useState({
-    name: '',
-    number: '',
+    name: 'myName',
+    number: 0,
   });
 
   const [notificationMessage, setNotificationMessage] = useState(null);
+  const [errorMessage, setErrorMessage] = useState(null);
 
   useEffect(() => {
     if (defaultValues) {
@@ -23,6 +25,7 @@ const PersonForm = ({ onSave, defaultValues, persons, person, setPersons }) => {
     setValues((prev) => ({
       ...prev,
       [e.target.name]: e.target.value,
+      [e.target.number]: e.target.value,
     }));
   };
 
@@ -45,6 +48,9 @@ const PersonForm = ({ onSave, defaultValues, persons, person, setPersons }) => {
     const notificationTimeOut = () => {
       setNotificationMessage(null);
     };
+    const errorTImeOut = () => {
+      setErrorMessage(null);
+    };
     // if person exist
     const samePersonName = await persons.find(
       (person) => person.name === values.name
@@ -59,7 +65,7 @@ const PersonForm = ({ onSave, defaultValues, persons, person, setPersons }) => {
           // update that person with the new values
           onUpdatePerson(person.id);
           setNotificationMessage(`${values.name}'s number modified!`);
-          setValues(null);
+          setValues('');
           setTimeout(notificationTimeOut, 5000);
         }
         return;
@@ -69,13 +75,16 @@ const PersonForm = ({ onSave, defaultValues, persons, person, setPersons }) => {
       setValues('');
       setTimeout(notificationTimeOut, 5000);
     } catch (error) {
-      console.log(error.msg);
+      setErrorMessage(error.message);
+      setValues('');
+      setTimeout(errorTImeOut, 5000);
     }
   };
 
   return (
     <div>
-      <Notifications notificationMessage={notificationMessage} />
+      {notificationMessage && <Notifications notificationMessage={notificationMessage} />}
+      {errorMessage && <Error errorMessage={errorMessage} />}
       <form
         onSubmit={e => e.preventDefault()}
       >

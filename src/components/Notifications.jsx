@@ -4,7 +4,7 @@ const Notifications = ({ notificationMessage }) => {
   if (notificationMessage === null) {
     return null;
   }
-  return <div className={`${notificationMessage} ? error : '' `}>{notificationMessage}</div>;
+  return <div className={`${notificationMessage} ? notification : '' `}>{notificationMessage}</div>;
 };
 
 export default Notifications;
