@@ -8,7 +8,7 @@ const PersonForm = ({ onSave, defaultValues, persons, person, setPersons }) => {
     number: '',
   });
 
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [notificationMessage, setNotificationMessage] = useState(null);
 
   useEffect(() => {
     if (defaultValues) {
@@ -42,36 +42,40 @@ const PersonForm = ({ onSave, defaultValues, persons, person, setPersons }) => {
   };
 
   const onSubmit = async () => {
-    const timeOut = setTimeout(() => {
-      setErrorMessage(null);
-    }, 5000);
+    const notificationTimeOut = () => {
+      setNotificationMessage(null);
+    };
     // if person exist
-    const samePersonName = persons.find(
+    const samePersonName = await persons.find(
       (person) => person.name === values.name
     );
-    if (samePersonName) {
-      // popup
-      const isOk = window.confirm(
-        `${values.name} is already added to phonebook, replace the old number with a new one?`
-      );
-      if (isOk) {
-        // update that person with the new values
-        onUpdatePerson(person.id);
-        setErrorMessage(`${values.name}'s number modified!`);
-        setValues(null);
-        timeOut();
+    try {
+      if (samePersonName) {
+        // popup
+        const isOk = window.confirm(
+          `${values.name} is already added to phonebook, replace the old number with a new one?`
+        );
+        if (isOk) {
+          // update that person with the new values
+          onUpdatePerson(person.id);
+          setNotificationMessage(`${values.name}'s number modified!`);
+          setValues(null);
+          setTimeout(notificationTimeOut, 5000);
+        }
+        return;
       }
-      return;
+      onSave(values);
+      setNotificationMessage(`added ${values.name} ! `);
+      setValues('');
+      setTimeout(notificationTimeOut, 5000);
+    } catch (error) {
+      console.log(error.msg);
     }
-    onSave(values);
-    setErrorMessage(`added ${values.name} ! `);
-    setValues('');
-    timeOut();
   };
 
   return (
     <div>
-      <Notifications message={errorMessage} values={values.name} />
+      <Notifications notificationMessage={notificationMessage} />
       <form
         onSubmit={e => e.preventDefault()}
       >

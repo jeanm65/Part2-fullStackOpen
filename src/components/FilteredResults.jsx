@@ -3,10 +3,10 @@ import React from "react";
 const FilteredResults = ({ filteredPersons, onDelete }) => {
   return (
     <div>
-      {filteredPersons.map((person) => {
+      {filteredPersons.map((person, index) => {
         return (
-          <div key={person.id}>
-            <span key={person.id}>
+          <div key={index}>
+            <span>
               {JSON.stringify(person.name)} - {JSON.stringify(person.number)}{" "}
             </span>
             <button
