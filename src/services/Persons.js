@@ -14,7 +14,7 @@ export const getPersonById = async (id) => {
 
 export const getPersonByName = async (name) => {
   const result = await find(PERSONS_ENDPOINT + "/" + name);
-  console.log('result from getPersonByName:',result);
+  // console.log('result from getPersonByName:',result);
   
   return result;
 };
@@ -31,7 +31,6 @@ export const removePerson = async (id) => {
 
 export const editPerson = async (id, values) => {
   const result = await edit(PERSONS_ENDPOINT, id, values); 
-  // console.log('result of edit:', result);
-  
+  console.log('result of edit:', result);
   return result;
 };

@@ -1,18 +1,24 @@
 import React from "react";
 
-const FilteredResults = ({ filteredPersons, onDelete }) => {
+const FilteredResults = ({ onDelete, filteredPersons }) => {
+  // const result1 = filteredPersons;
+  // console.log('typeOf filteredPersons : ', typeof(result1));
+
   return (
     <div>
       {filteredPersons.map((person, index) => {
+
         return (
           <div key={index}>
             <span>
-              {JSON.stringify(person.name)} - {JSON.stringify(person.number)}{" "}
+              {person.name} - {person.number}{" "}
             </span>
             <button
               onClick={() => {
-                onDelete(person.id);
-                window.confirm(`delete ${person.name} ?`);
+                const isOk = window.confirm(`delete ${person.name} ?`);
+                if (isOk) {
+                  onDelete(person.id);
+                }
               }}
             >
               delete
@@ -20,6 +26,7 @@ const FilteredResults = ({ filteredPersons, onDelete }) => {
           </div>
         );
       })}
+
     </div>
   );
 };

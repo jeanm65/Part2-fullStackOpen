@@ -1,22 +1,24 @@
-import React, { useEffect, useState } from "react";
-import Error from "../../components/Error";
-import Notifications from "../../components/Notifications";
-import { editPerson } from "../../services/Persons";
+import React, { useCallback, useEffect, useState } from "react";
+// import Error from "../../components/Error";
+import Alert from "../../components/Alert";
+import { createPerson, editPerson } from "../../services/Persons";
 
-const PersonForm = ({ onSave, defaultValues, persons, person, setPersons }) => {
+const PersonForm = ({ defaultValues, persons, person, setPersons }) => {
   const [values, setValues] = useState({
-    name: 'myName',
-    number: 0,
+    name: "",
+    number: ""
   });
 
-  const [notificationMessage, setNotificationMessage] = useState(null);
-  const [errorMessage, setErrorMessage] = useState(null);
+  const [alert, setAlert] = useState({
+    type: "",
+    message: ""
+  });
 
   useEffect(() => {
     if (defaultValues) {
       setValues((prev) => ({
         ...prev,
-        ...defaultValues,
+        ...defaultValues
       }));
     }
   }, [defaultValues]);
@@ -24,35 +26,68 @@ const PersonForm = ({ onSave, defaultValues, persons, person, setPersons }) => {
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value,
-      [e.target.number]: e.target.value,
+      [e.target.name]: e.target.value
     }));
   };
 
+  const _handleCreatePerson = useCallback(
+    async (values) => {
+      try {
+        const person = await createPerson(values);
+        setPersons((prev) => {
+          return [
+            ...prev,
+            {
+              id: persons[persons.length - 1].id++,
+              ...person
+            }
+          ];
+        });
+      } catch (error) {
+        console.log(error.message);
+      }
+    },
+    [persons, setPersons]
+  );
+
   // update number
-  const onUpdatePerson = async () => {
-    const id = await persons.find((p) => p.name === values.name && p.id);
+  const _onUpdatePerson = useCallback(async () => {
+    try {
+      const currentPerson = await persons.find(
+        (p) => p.name === values.name && p.id
+      );
+      console.log('currentPerson:', currentPerson);
+      
 
-    const newValues = { name: values.name, id: id.id, number: values.number };
+      const newValues = {
+      ...currentPerson,
+       number: values.number
+      };
+      console.log('newValues:', newValues);
+      
+  
+      const updatedPerson = await editPerson(currentPerson.id, newValues);
+      console.log('updatedPerson:', updatedPerson);
+      
+      const newPersons = await persons.map((person) => {
+        if (person.id === currentPerson.id) {
+          return updatedPerson;
+        }
+        return person;
+      });
+  
+      setPersons(newPersons);
+    } catch (error) {
+      console.log('error:', error.message);
+      
+    }
+    
+  }, [persons, setPersons, values]);
 
-    const updatedPerson = await editPerson(id.id, newValues);
-
-    setPersons(
-      persons.map((person) =>
-        person.id === id.id ? { ...updatedPerson } : person
-      )
-    );
-  };
-
-  const onSubmit = async () => {
-    const notificationTimeOut = () => {
-      setNotificationMessage(null);
-    };
-    const errorTImeOut = () => {
-      setErrorMessage(null);
-    };
+  const onSubmit = async (e) => {
+    e.preventDefault();
     // if person exist
-    const samePersonName = await persons.find(
+    const samePersonName = persons.find(
       (person) => person.name === values.name
     );
     try {
@@ -63,31 +98,51 @@ const PersonForm = ({ onSave, defaultValues, persons, person, setPersons }) => {
         );
         if (isOk) {
           // update that person with the new values
-          onUpdatePerson(person.id);
-          setNotificationMessage(`${values.name}'s number modified!`);
-          setValues('');
-          setTimeout(notificationTimeOut, 5000);
+          await _onUpdatePerson(person.id);
+           
+          setAlert({
+            type: "success",
+            message: `${values.name}'s number modified!`
+          });
+          setValues({
+            name:"",
+            number:""
+          });
+          setTimeout(() => {
+            setAlert({ type: "" });
+          }, 5000);
         }
         return;
       }
-      onSave(values);
-      setNotificationMessage(`added ${values.name} ! `);
-      setValues('');
-      setTimeout(notificationTimeOut, 5000);
+      await _handleCreatePerson(values);
+      setAlert({
+        type: "success",
+        message: `${values.name} added! `
+      });
+      setValues({
+        name: "",
+        number: ""
+      });
+      setTimeout(() => setAlert({ type: "" }), 5000);
     } catch (error) {
-      setErrorMessage(error.message);
-      setValues('');
-      setTimeout(errorTImeOut, 5000);
+        setAlert({
+          type: "error",
+          message: `information of ${values.name} has been already removed from server`
+        });
+        setValues({
+          name: "",
+          number: ""
+        });
+        setTimeout(() => {
+          setAlert({ type: "" });
+        }, 5000);
     }
   };
 
   return (
     <div>
-      {notificationMessage && <Notifications notificationMessage={notificationMessage} />}
-      {errorMessage && <Error errorMessage={errorMessage} />}
-      <form
-        onSubmit={e => e.preventDefault()}
-      >
+      <Alert message={alert.message} type={alert.type} />
+      <form onSubmit={onSubmit}>
         <div>
           name:
           <input name="name" value={values.name} onChange={handleChange} />{" "}
@@ -98,10 +153,7 @@ const PersonForm = ({ onSave, defaultValues, persons, person, setPersons }) => {
           <input name="number" value={values.number} onChange={handleChange} />
         </div>
         <div>
-          <button type="submit" onClick={() => {onSubmit();
-          setValues('')}}>
-            Add
-          </button>
+          <button type="submit">Add</button>
         </div>
       </form>
     </div>

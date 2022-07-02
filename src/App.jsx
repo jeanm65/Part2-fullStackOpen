@@ -5,12 +5,9 @@ import PersonForm from "./containers/persons/PersonForm";
 import { createPerson } from "./services/Persons";
 import { removePerson } from "./services/Persons";
 import { getPersons } from "./services/Persons";
-import Notifications from "./components/Notifications";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
 
   const [search, setSearch] = useState("");
 
@@ -45,15 +42,11 @@ const App = () => {
         return [
           ...prev,
           {
-            newName,
-            newNumber,
-            id: persons[persons.length - 1].id++,
+            id: persons.length + 1,
             ...person,
           },
         ];
       });
-      setNewName(newName);
-      setNewNumber(newNumber);
     } catch (error) {
       console.log(error.message);
     }
@@ -62,7 +55,7 @@ const App = () => {
   const handleNewSearch = (e) => {
     setSearch(e.target.value);
   };
-  const filtered = !search ? (
+  const filteredPersons = !search ? (
     persons
   ) : search ? (
     persons.filter((person) =>
@@ -71,7 +64,7 @@ const App = () => {
   ) : (
     <h2>No results found!</h2>
   );
-
+  
   return (
     <div>
       <h2>Phonebook</h2>
@@ -80,7 +73,7 @@ const App = () => {
         <Filter
           onChange={handleNewSearch}
           value={search}
-          filteredPersons={filtered}
+          filteredPersons={filteredPersons}
           onDelete={handleDeletePerson}
         />
       </div>
@@ -92,8 +85,10 @@ const App = () => {
         setPersons={setPersons}
       />
       <FilteredResults
-        filteredPersons={filtered}
+        filteredPersons={filteredPersons}
         onDelete={handleDeletePerson}
+        search={search}
+        persons={persons}
       />
     </div>
   );
