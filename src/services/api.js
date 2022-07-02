@@ -33,7 +33,6 @@ export const remove = async (url, id) => {
 };
 
 export const edit = async (url, id, values) => {
-  try {
     const completeUrl = url + "/" + id;
     console.log('edit [request]: ', { url: completeUrl, values });
     const result = await instance.put(completeUrl , values);
@@ -41,8 +40,4 @@ export const edit = async (url, id, values) => {
 
     if (result.status !== 200) return;
     return result.data;
-  } catch (error) {
-    // to find the origin of the error quickly
-    console.log('fileName.functionName error: ', error.message);
-  }
 };

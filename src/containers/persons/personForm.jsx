@@ -38,6 +38,8 @@ const PersonForm = ({ defaultValues, persons, person, setPersons }) => {
           return [
             ...prev,
             {
+              name:values.name,
+              number:values.number,
               id: persons[persons.length - 1].id++,
               ...person
             }
@@ -75,11 +77,23 @@ const PersonForm = ({ defaultValues, persons, person, setPersons }) => {
         }
         return person;
       });
+      // const newPersons = persons.filter(p => p.name === values.name );
   
       setPersons(newPersons);
     } catch (error) {
-      console.log('error:', error.message);
-      
+      setPersons(persons.filter(p => p.name !== values.name ));
+      // console.log('error:', error.message);
+      setAlert({
+        type: "error",
+        message: `information of ${values.name} has been already removed from server`
+      });
+      setValues({
+        name: "",
+        number: ""
+      });
+      setTimeout(() => {
+        setAlert({ type: "" });
+      }, 5000);
     }
     
   }, [persons, setPersons, values]);
@@ -87,10 +101,10 @@ const PersonForm = ({ defaultValues, persons, person, setPersons }) => {
   const onSubmit = async (e) => {
     e.preventDefault();
     // if person exist
-    const samePersonName = persons.find(
-      (person) => person.name === values.name
-    );
     try {
+      const samePersonName = persons.find(
+        (person) => person.name === values.name
+      );
       if (samePersonName) {
         // popup
         const isOk = window.confirm(
