@@ -1,6 +1,6 @@
 import React from 'react';
 
-const FilteredResuls = ({filteredPersons, onDelete}) => {
+const FilteredResults = ({filteredPersons, onDelete}) => {
   return (
     <div>
       {filteredPersons.map((person, index) => {
@@ -22,4 +22,4 @@ const FilteredResuls = ({filteredPersons, onDelete}) => {
   );
 };
 
-export default FilteredResuls;
+export default FilteredResults;

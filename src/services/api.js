@@ -25,7 +25,7 @@ export const remove = async (url, id) => {
 
 export const edit = async (url, id, values) => {
   const result = await instance.put(`${url}/${id}`, values);
-  console.log('result-data:', result.data);
+  // console.log('result-data:', result.data);
   
   if (result.status !== 200) return;
   return result.data;

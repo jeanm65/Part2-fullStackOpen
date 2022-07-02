@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import FilteredResuls from "./components/FilteredResuls";
+import FilteredResults from "./components/FilteredResults";
 import Filter from "./components/FilterForm";
 import PersonForm from "./containers/persons/PersonForm";
 import { createPerson } from "./services/Persons";
@@ -85,7 +85,7 @@ const App = () => {
         person={persons.map((p) => p)}
         setPersons={setPersons}
       />
-      <FilteredResuls
+      <FilteredResults
         filteredPersons={filtered}
         onDelete={handleDeletePerson}
       />

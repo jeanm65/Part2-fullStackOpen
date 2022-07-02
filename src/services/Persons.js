@@ -6,18 +6,6 @@ export const getPersons = async () => {
   return result;
 };
 
-export const getPersonById = async (id) => {
-  const result = await find(PERSONS_ENDPOINT + "/" + id);
-  
-  return result;
-};
-
-export const getPersonByName = async (name) => {
-  const result = await find(PERSONS_ENDPOINT + "/" + name);
-  console.log('result from getPersonByName:',result);
-  
-  return result;
-};
 
 export const createPerson = async (values) => {
   const result = await create(PERSONS_ENDPOINT, values);
