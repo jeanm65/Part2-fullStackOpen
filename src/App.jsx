@@ -1,45 +1,38 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import Filter from "./components/Filter";
-import PersonForm from "./components/PersonForm";
+import FilteredResults from "./components/FilteredResults";
+import Filter from "./components/FilterForm";
+import PersonForm from "./containers/persons/PersonForm";
+import { createPerson } from "./services/Persons";
+import { getPersons } from "./services/Persons";
 
 const App = () => {
   const [persons, setPersons] = useState([]);
+
   const [search, setSearch] = useState("");
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
+
   useEffect(() => {
-    axios.get("http://localhost:3001/persons").then((response) => {
-      const data = response.data;
-      setPersons(data);
-    });
-  }, []);
-  const handleNameChange = (e) => {
-    setNewName(e.target.value);
-  };
-  const handleNumberChange = (e) => {
-    setNewNumber(e.target.value);
-  };
-  const addName = (e) => {
-    e.preventDefault();
-    if (persons.find((p) => p.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
-      setNewName("");
-      return false;
-    }
-    const nameObject = {
-      name: newName,
-      number: newNumber,
-      id: persons.length + 1,
+    const init = async () => {
+      const result = await getPersons();
+      setPersons(result);
     };
-    setPersons(persons.concat(nameObject));
-    setNewName("");
-    axios.post("http://localhost:3001/persons", nameObject).then((res) => {
-      console.log(res);
-    });
-  };
+    init();
+  }, []);
 
   //Search and filter
+
+  // creation
+  const handleCreatePerson = async (values) => {
+    const person = await createPerson(values);
+    setPersons((prev) => {
+      return [
+        ...prev,
+        {
+          id: persons[persons.length - 1].id++,
+          ...person,
+        },
+      ];
+    });
+  };
 
   const handleNewSearch = (e) => {
     setSearch(e.target.value);
@@ -58,24 +51,22 @@ const App = () => {
     <div>
       <h2>Phonebook</h2>
       <div>
-        <Filter onChange={handleNewSearch} value={search} />
+        <Filter
+          onChange={handleNewSearch}
+          value={search}
+          filteredPersons={filtered}
+        />
       </div>
-      <h2>Add a new</h2>
+      <h2>Add a new person</h2>
       <PersonForm
-        addName={addName}
-        newName={newName}
-        newNumber={newNumber}
-        handleNameChange={handleNameChange}
-        handleNumberChange={handleNumberChange}
+        onSave={handleCreatePerson}
+        persons={persons}
+        person={persons.map((p) => p)}
+        setPersons={setPersons}
       />
-      <h2>Numbers</h2>
-      {filtered.map((person) => {
-        return (
-          <p key={person.id}>
-            {person.name} - {person.number}
-          </p>
-        );
-      })}
+      <FilteredResults
+        filteredPersons={filtered}
+      />
     </div>
   );
 };
