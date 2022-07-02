@@ -33,11 +33,15 @@ export const remove = async (url, id) => {
 };
 
 export const edit = async (url, id, values) => {
+  // try {
     const completeUrl = url + "/" + id;
-    console.log('edit [request]: ', { url: completeUrl, values });
-    const result = await instance.put(completeUrl , values);
-    console.log('edit [result]: ', result);
+    console.log("edit [request]: ", { url: completeUrl, values });
+    const result = await instance.put(completeUrl, values);
+    console.log("edit [result]: ", result);
 
     if (result.status !== 200) return;
     return result.data;
+  // } catch (error) {
+    // console.log(error.message);
+  // }
 };

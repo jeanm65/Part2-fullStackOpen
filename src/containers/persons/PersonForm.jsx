@@ -6,19 +6,19 @@ import { createPerson, editPerson } from "../../services/Persons";
 const PersonForm = ({ defaultValues, persons, person, setPersons }) => {
   const [values, setValues] = useState({
     name: "",
-    number: ""
+    number: "",
   });
 
   const [alert, setAlert] = useState({
     type: "",
-    message: ""
+    message: "",
   });
 
   useEffect(() => {
     if (defaultValues) {
       setValues((prev) => ({
         ...prev,
-        ...defaultValues
+        ...defaultValues,
       }));
     }
   }, [defaultValues]);
@@ -26,7 +26,7 @@ const PersonForm = ({ defaultValues, persons, person, setPersons }) => {
   const handleChange = (e) => {
     setValues((prev) => ({
       ...prev,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     }));
   };
 
@@ -38,15 +38,15 @@ const PersonForm = ({ defaultValues, persons, person, setPersons }) => {
           return [
             ...prev,
             {
-              name:values.name,
-              number:values.number,
+              name: values.name,
+              number: values.number,
               id: persons[persons.length - 1].id++,
-              ...person
-            }
+              ...person,
+            },
           ];
         });
       } catch (error) {
-        console.log(error.message);
+        console.log(console.message);
       }
     },
     [persons, setPersons]
@@ -54,48 +54,28 @@ const PersonForm = ({ defaultValues, persons, person, setPersons }) => {
 
   // update number
   const _onUpdatePerson = useCallback(async () => {
-    try {
-      const currentPerson = await persons.find(
-        (p) => p.name === values.name && p.id
-      );
-      console.log('currentPerson:', currentPerson);
-      
+    const currentPerson = await persons.find(
+      (p) => p.name === values.name && p.id
+    );
+    // console.log('currentPerson:', currentPerson);
 
-      const newValues = {
+    const newValues = {
       ...currentPerson,
-       number: values.number
-      };
-      console.log('newValues:', newValues);
-      
-  
-      const updatedPerson = await editPerson(currentPerson.id, newValues);
-      console.log('updatedPerson:', updatedPerson);
-      
-      const newPersons = await persons.map((person) => {
-        if (person.id === currentPerson.id) {
-          return updatedPerson;
-        }
-        return person;
-      });
-      // const newPersons = persons.filter(p => p.name === values.name );
-  
-      setPersons(newPersons);
-    } catch (error) {
-      setPersons(persons.filter(p => p.name !== values.name ));
-      // console.log('error:', error.message);
-      setAlert({
-        type: "error",
-        message: `information of ${values.name} has been already removed from server`
-      });
-      setValues({
-        name: "",
-        number: ""
-      });
-      setTimeout(() => {
-        setAlert({ type: "" });
-      }, 5000);
-    }
-    
+      number: values.number,
+    };
+    // console.log('newValues:', newValues);
+
+    const updatedPerson = await editPerson(currentPerson.id, newValues);
+    // console.log('updatedPerson:', updatedPerson);
+
+    const newPersons = await persons.map((person) => {
+      if (person.id === currentPerson.id) {
+        return updatedPerson;
+      }
+      return person;
+    });
+
+    setPersons(newPersons);
   }, [persons, setPersons, values]);
 
   const onSubmit = async (e) => {
@@ -110,17 +90,18 @@ const PersonForm = ({ defaultValues, persons, person, setPersons }) => {
         const isOk = window.confirm(
           `${values.name} is already added to phonebook, replace the old number with a new one?`
         );
+
         if (isOk) {
           // update that person with the new values
           await _onUpdatePerson(person.id);
-           
+
           setAlert({
             type: "success",
-            message: `${values.name}'s number modified!`
+            message: `${values.name}'s number modified!`,
           });
           setValues({
-            name:"",
-            number:""
+            name: "",
+            number: "",
           });
           setTimeout(() => {
             setAlert({ type: "" });
@@ -128,28 +109,30 @@ const PersonForm = ({ defaultValues, persons, person, setPersons }) => {
         }
         return;
       }
+
       await _handleCreatePerson(values);
       setAlert({
         type: "success",
-        message: `${values.name} added! `
+        message: `${values.name} added! `,
       });
       setValues({
         name: "",
-        number: ""
+        number: "",
       });
       setTimeout(() => setAlert({ type: "" }), 5000);
     } catch (error) {
-        setAlert({
-          type: "error",
-          message: `information of ${values.name} has been already removed from server`
-        });
-        setValues({
-          name: "",
-          number: ""
-        });
-        setTimeout(() => {
-          setAlert({ type: "" });
-        }, 5000);
+      console.log(error.message);
+      setAlert({
+        type: "error",
+        message: `information of ${values.name} has been already removed from server`,
+      });
+      setValues({
+        name: "",
+        number: "",
+      });
+      setTimeout(() => {
+        setAlert({ type: "" });
+      }, 5000);
     }
   };
 
