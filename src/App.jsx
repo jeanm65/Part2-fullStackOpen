@@ -1,46 +1,49 @@
-import axios from "axios";
 import { useEffect, useState } from "react";
-import Filter from "./components/Filter";
-import PersonForm from "./components/PersonForm";
-import personServices from "./services/persons";
+import FilteredResults from "./components/FilteredResults";
+import Filter from "./components/FilterForm";
+import PersonForm from "./containers/persons/PersonForm";
+import { createPerson } from "./services/Persons";
+import { removePerson } from "./services/Persons";
+import { getPersons } from "./services/Persons";
+
 
 const App = () => {
   const [persons, setPersons] = useState([]);
   const [search, setSearch] = useState("");
-  const [newName, setNewName] = useState("");
-  const [newNumber, setNewNumber] = useState("");
+
   useEffect(() => {
-    personServices.getAll().then((response) => {
-      const data = response.data;
-      setPersons(data);
-    });
-  }, []);
-  const handleNameChange = (e) => {
-    setNewName(e.target.value);
-  };
-  const handleNumberChange = (e) => {
-    setNewNumber(e.target.value);
-  };
-  const addName = (e) => {
-    e.preventDefault();
-    if (persons.find((p) => p.name === newName)) {
-      alert(`${newName} is already added to phonebook`);
-      setNewName("");
-      return false;
-    }
-    const nameObject = {
-      name: newName,
-      number: newNumber,
-      id: persons.length + 1,
+    const init = async () => {
+      const result = await getPersons();
+      setPersons(result);
     };
-    setPersons(persons.concat(nameObject));
-    setNewName("");
-    personServices.create.then((res) => {
-      console.log(res);
-    });
-  };
+    init();
+  }, []);
 
   //Search and filter
+  // deletion
+  const handleDeletePerson = async (id) => {
+    try {
+      await removePerson(id);
+      const newPersons = persons.filter((p) => p.id !== id);
+      setPersons(newPersons);
+    } catch (error) {
+      console.log("errorMessage:", error.message);
+    }
+  };
+
+  // creation
+  const handleCreatePerson = async (values) => {
+    const person = await createPerson(values);
+    setPersons((prev) => {
+      return [
+        ...prev,
+        {
+          id: persons[persons.length - 1].id++,
+          ...person,
+        },
+      ];
+    });
+  };
 
   const handleNewSearch = (e) => {
     setSearch(e.target.value);
@@ -55,41 +58,28 @@ const App = () => {
     <h2>No results found!</h2>
   );
 
-  const removeUser = (id) => {
-    axios.delete(`http://localhost:3001/persons/${id}`);
-    setPersons(persons.filter((person) => person.id !== id));
-  };
-
   return (
     <div>
       <h2>Phonebook</h2>
       <div>
-        <Filter onChange={handleNewSearch} value={search} />
+        <Filter
+          onChange={handleNewSearch}
+          value={search}
+          filteredPersons={filtered}
+          onDelete={handleDeletePerson}
+        />
       </div>
-      <h2>Add a new</h2>
+      <h2>Add a new person</h2>
       <PersonForm
-        addName={addName}
-        newName={newName}
-        newNumber={newNumber}
-        handleNameChange={handleNameChange}
-        handleNumberChange={handleNumberChange}
+        onSave={handleCreatePerson}
+        persons={persons}
+        person={persons.map((p) => p)}
+        setPersons={setPersons}
       />
-      <h2>Numbers</h2>
-      {filtered.map((person) => {
-        return (
-          <p key={person.id}>
-            {person.name} - {person.number}
-            <button
-              onClick={() => {
-                removeUser(person.id);
-                window.confirm(`delete ${person.name} ?`);
-              }}
-            >
-              delete
-            </button>
-          </p>
-        );
-      })}
+      <FilteredResults
+        filteredPersons={filtered}
+        onDelete={handleDeletePerson}
+      />
     </div>
   );
 };
