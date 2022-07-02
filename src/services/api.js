@@ -2,7 +2,7 @@ import axios from "axios";
 import { BASE_URL } from "../utils/constants";
 
 const instance = axios.create({
-  baseURL: BASE_URL
+  baseURL: BASE_URL,
 });
 
 export const find = async (url) => {
@@ -24,9 +24,9 @@ export const remove = async (url, id) => {
 };
 
 export const edit = async (url, id, values) => {
-  const result = instance.put(`${url}/${id}`, values);
-  console.log('result-data:', result.data);
-  
+  const result = await instance.put(`${url}/${id}`, values);
+  // console.log('result-data:', result.data);
+
   if (result.status !== 200) return;
   return result.data;
 };
