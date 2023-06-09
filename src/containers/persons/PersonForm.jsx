@@ -40,7 +40,7 @@ const PersonForm = ({ defaultValues, persons, person, setPersons }) => {
             {
               name: values.name,
               number: values.number,
-              id: persons[persons.length - 1].id++,
+              id: persons[persons.length - 1].id + 1,
               ...person,
             },
           ];
